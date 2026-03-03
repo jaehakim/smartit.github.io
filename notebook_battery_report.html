@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samsung Galaxy Book2 NT550XEZ - 배터리 교체 분석 보고서 2026-03-02</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --border: #334155;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-light: #60a5fa;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --orange: #f97316;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, #1e3a5f, #1e293b);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+    header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--accent-light); }
+    header p { color: var(--text-muted); font-size: 0.95rem; }
+    .meta-info {
+      display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;
+    }
+    .meta-tag {
+      background: var(--surface);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .section h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section h2 .icon { font-size: 1.4rem; }
+    .diagram-container {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      overflow-x: auto;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .stat-card {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1.2rem;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-card .label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .stat-card .value { font-size: 1.8rem; font-weight: bold; }
+    .stat-card .value.good { color: var(--green); }
+    .stat-card .value.warn { color: var(--yellow); }
+    .stat-card .value.bad { color: var(--red); }
+    .stat-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .verdict {
+      background: linear-gradient(135deg, #7f1d1d33, #1e293b);
+      border: 1px solid #ef444466;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    .verdict h3 { color: var(--red); font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .verdict p { color: var(--text-muted); }
+    .alt-box {
+      background: linear-gradient(135deg, #14532d33, #1e293b);
+      border: 1px solid #22c55e66;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    .alt-box h3 { color: var(--green); margin-bottom: 0.8rem; }
+    .alt-box ul { list-style: none; padding: 0; }
+    .alt-box ul li { padding: 0.4rem 0; color: var(--text-muted); }
+    .alt-box ul li::before { content: "-> "; color: var(--green); font-weight: bold; }
+    table.spec {
+      width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    table.spec th, table.spec td {
+      padding: 0.6rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    table.spec th { color: var(--accent-light); font-weight: 600; width: 35%; }
+    table.spec td { color: var(--text); }
+    table.compare { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    table.compare th, table.compare td {
+      padding: 0.6rem 0.8rem; text-align: center; border: 1px solid var(--border);
+    }
+    table.compare th { background: var(--bg); color: var(--accent-light); }
+    table.compare .no { color: var(--red); font-weight: bold; }
+    footer {
+      text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem;
+    }
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Samsung Galaxy Book2 - 배터리 교체 분석 보고서</h1>
+    <p>NT550XEZ-A58AG (550XED) 노트북 시스템 사양 및 배터리 대용량 교체 가능성 분석</p>
+    <div class="meta-info">
+      <span class="meta-tag">작성일: 2026-03-02</span>
+      <span class="meta-tag">모델: NT550XEZ-A58AG</span>
+      <span class="meta-tag">배터리: AA-PBUN3AB</span>
+    </div>
+  </header>
+
+  <!-- 1. 시스템 사양 개요 -->
+  <div class="section">
+    <h2><span class="icon">1.</span> 시스템 하드웨어 구성</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+block-beta
+  columns 3
+  block:header:3
+    columns 3
+    H["Samsung Galaxy Book2\nNT550XEZ-A58AG"]
+  end
+
+  block:cpu
+    columns 1
+    CPU["CPU\ni5-1235U 12th Gen"]
+    CORES["10C / 12T\n최대 4.4GHz"]
+  end
+
+  block:memory
+    columns 1
+    RAM["RAM\nDDR5-3200"]
+    RAMSIZE["32GB\n(16GB x 2)"]
+  end
+
+  block:gpu
+    columns 1
+    GPU["GPU\nIntel Iris Xe"]
+    VRAM["내장 그래픽\n1GB 공유"]
+  end
+
+  block:storage:2
+    columns 1
+    SSD["SSD: WD Blue SN580 1TB NVMe"]
+  end
+
+  block:os
+    columns 1
+    OS["Windows 11 Pro\nBuild 26200"]
+  end
+
+  style H fill:#1e3a5f,color:#60a5fa
+  style CPU fill:#1e293b,color:#e2e8f0
+  style CORES fill:#0f172a,color:#94a3b8
+  style RAM fill:#1e293b,color:#e2e8f0
+  style RAMSIZE fill:#0f172a,color:#94a3b8
+  style GPU fill:#1e293b,color:#e2e8f0
+  style VRAM fill:#0f172a,color:#94a3b8
+  style SSD fill:#1e293b,color:#e2e8f0
+  style OS fill:#1e293b,color:#e2e8f0
+      </pre>
+    </div>
+
+    <table class="spec">
+      <tr><th>제조사 / 모델</th><td>Samsung Electronics / Galaxy Book2 (550XED)</td></tr>
+      <tr><th>정확한 모델번호</th><td>NT550XEZ-A58AG</td></tr>
+      <tr><th>CPU</th><td>Intel Core i5-1235U (12세대 Alder Lake) - 2P+8E / 12T, 최대 4.4GHz</td></tr>
+      <tr><th>메모리</th><td>32GB DDR5-3200 (Samsung 16GB x 2)</td></tr>
+      <tr><th>그래픽</th><td>Intel Iris Xe Graphics (내장)</td></tr>
+      <tr><th>저장장치</th><td>WD Blue SN580 1TB NVMe SSD</td></tr>
+      <tr><th>디스플레이</th><td>15.6" FHD (1920x1080)</td></tr>
+      <tr><th>OS</th><td>Windows 11 Pro 64비트 (Build 26200)</td></tr>
+    </table>
+  </div>
+
+  <!-- 2. 배터리 현재 상태 -->
+  <div class="section">
+    <h2><span class="icon">2.</span> 배터리 현재 상태</h2>
+
+    <div class="grid-2" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.5rem;">
+      <div class="stat-card">
+        <div class="label">설계 용량</div>
+        <div class="value">44,027</div>
+        <div class="sub">mWh (~43Wh)</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">현재 완충 용량</div>
+        <div class="value warn">39,372</div>
+        <div class="sub">mWh</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">배터리 건강도</div>
+        <div class="value good">89.4%</div>
+        <div class="sub">양호</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">충방전 사이클</div>
+        <div class="value">137</div>
+        <div class="sub">회</div>
+      </div>
+    </div>
+
+    <div class="diagram-container">
+      <pre class="mermaid">
+xychart-beta
+  title "배터리 용량 변화 추이 (mWh)"
+  x-axis ["2024.06","2024.10","2024.12","2025.01","2025.05","2025.06","2026.01","2026.03"]
+  y-axis "완충 용량 (mWh)" 35000 --> 45000
+  line [41688, 40530, 40528, 40426, 39372, 39372, 39372, 39372]
+  line [44027, 44027, 44027, 44027, 44027, 44027, 44027, 44027]
+      </pre>
+    </div>
+    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem; margin-top:0.5rem;">
+      상단 직선 = 설계 용량 (44,027 mWh) / 하단 곡선 = 실제 완충 용량
+    </p>
+
+    <table class="spec" style="margin-top:1.5rem;">
+      <tr><th>배터리 이름</th><td>SR Real Battery</td></tr>
+      <tr><th>부품번호</th><td>AA-PBUN3AB (호환: AA-PBUN3QB)</td></tr>
+      <tr><th>삼성 내부 P/N</th><td>BA43-00379A / BA43-00377A</td></tr>
+      <tr><th>전압</th><td>11.4V</td></tr>
+      <tr><th>용량</th><td>43Wh / 3,780 mAh (3셀)</td></tr>
+      <tr><th>화학 구성</th><td>Li-Polymer (리튬 폴리머)</td></tr>
+      <tr><th>셀 구성</th><td>3ICP6/60/80 (3셀)</td></tr>
+      <tr><th>연결 방식</th><td>내부 플랫 케이블 커넥터 (납땜 아님)</td></tr>
+    </table>
+  </div>
+
+  <!-- 3. 배터리 건강도 판정 -->
+  <div class="section">
+    <h2><span class="icon">3.</span> 배터리 건강도 판정</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+graph LR
+  A["배터리 건강도\n89.4%"] --> B{판정 기준}
+  B -->|"90~100%"| C["우수\n교체 불필요"]
+  B -->|"80~89%"| D["양호\n모니터링 권장"]
+  B -->|"60~79%"| E["주의\n교체 고려"]
+  B -->|"60% 미만"| F["위험\n즉시 교체"]
+
+  style A fill:#fbbf24,stroke:#f59e0b,color:#000
+  style C fill:#22c55e,stroke:#16a34a,color:#fff
+  style D fill:#3b82f6,stroke:#2563eb,color:#fff
+  style E fill:#f97316,stroke:#ea580c,color:#fff
+  style F fill:#ef4444,stroke:#dc2626,color:#fff
+      </pre>
+    </div>
+    <p style="text-align:center; color:var(--accent-light); margin-top:0.5rem;">
+      현재 89.4%로 <strong>"양호"</strong> 단계 - 당장 교체는 불필요하나 지속 모니터링 권장
+    </p>
+  </div>
+
+  <!-- 4. 대용량 교체 가능성 분석 -->
+  <div class="section">
+    <h2><span class="icon">4.</span> 대용량 배터리 교체 가능성 분석</h2>
+
+    <div class="diagram-container">
+      <pre class="mermaid">
+flowchart TD
+  Q["더 큰 용량 배터리로\n교체 가능한가?"]
+  Q --> CHK1["동일 모델 대용량 옵션 확인"]
+  Q --> CHK2["상위 모델 배터리 호환성 확인"]
+  Q --> CHK3["서드파티 대용량 배터리 확인"]
+
+  CHK1 --> R1["AA-PBUN3AB만 존재\n43~45Wh 동일 사양"]
+  CHK2 --> R2["NP750XED 배터리\nAA-PBSN4AT 54Wh"]
+  CHK3 --> R3["BOWEIRUI, Kingsener 등\n모두 43Wh 동일 사양"]
+
+  R2 --> COMP["호환성 비교"]
+  COMP --> V1["전압: 11.4V vs 15.4V"]
+  COMP --> V2["셀 수: 3셀 vs 4셀"]
+  COMP --> V3["커넥터/크기: 완전 상이"]
+
+  V1 --> FAIL["호환 불가"]
+  V2 --> FAIL
+  V3 --> FAIL
+
+  R1 --> RESULT["결론: 대용량 교체 불가"]
+  FAIL --> RESULT
+  R3 --> RESULT
+
+  style Q fill:#3b82f6,color:#fff,stroke:#2563eb
+  style FAIL fill:#ef4444,color:#fff,stroke:#dc2626
+  style RESULT fill:#7f1d1d,color:#fca5a5,stroke:#ef4444,stroke-width:3px
+  style R2 fill:#f59e0b,color:#000
+      </pre>
+    </div>
+
+    <div class="verdict">
+      <h3>결론: 대용량 배터리 교체 불가</h3>
+      <p>이 모델에 물리적으로 호환되는 배터리는 모두 동일한 43Wh(11.4V/3셀) 사양입니다.<br>
+      상위 모델의 54Wh 배터리는 전압(15.4V), 셀 수(4셀), 커넥터가 달라 장착 시 메인보드 손상 위험이 있습니다.</p>
+    </div>
+
+    <h3 style="margin: 1.5rem 0 1rem; color: var(--accent-light);">호환성 비교표</h3>
+    <table class="compare">
+      <tr>
+        <th>항목</th>
+        <th>현재 배터리 (AA-PBUN3AB)</th>
+        <th>상위 모델 (AA-PBSN4AT)</th>
+        <th>호환 여부</th>
+      </tr>
+      <tr>
+        <td>전압</td><td>11.4V</td><td>15.4V</td><td class="no">X 불일치</td>
+      </tr>
+      <tr>
+        <td>용량</td><td>43Wh</td><td>54Wh</td><td>-</td>
+      </tr>
+      <tr>
+        <td>셀 수</td><td>3셀</td><td>4셀</td><td class="no">X 불일치</td>
+      </tr>
+      <tr>
+        <td>커넥터</td><td>타입 A</td><td>타입 B</td><td class="no">X 불일치</td>
+      </tr>
+      <tr>
+        <td>물리적 크기</td><td>18.5mm 섀시용</td><td>15.4mm 섀시용</td><td class="no">X 불일치</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 5. 배터리 교체 절차 -->
+  <div class="section">
+    <h2><span class="icon">5.</span> 배터리 교체 절차 (동일 용량)</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+flowchart LR
+  A["전원 OFF\n충전기 분리"] --> B["하판 고무발 4개\n제거"]
+  B --> C["Phillips 나사\n제거"]
+  C --> D["플라스틱 도구로\n후면 패널 분리"]
+  D --> E["배터리 커넥터\n분리"]
+  E --> F["접착 테이프\n제거 후 배터리 분리"]
+  F --> G["새 배터리\n장착 및 연결"]
+  G --> H["후면 패널\n재조립"]
+
+  style A fill:#ef4444,color:#fff
+  style D fill:#f59e0b,color:#000
+  style F fill:#f59e0b,color:#000
+  style G fill:#22c55e,color:#fff
+  style H fill:#3b82f6,color:#fff
+      </pre>
+    </div>
+
+    <h3 style="margin: 1.5rem 0 1rem; color: var(--accent-light);">교체 비용 비교</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+pie title "배터리 교체 옵션별 비용 (KRW)"
+  "삼성 서비스센터 (131,000원)" : 131000
+  "서드파티 자가교체 (37,000원)" : 37000
+      </pre>
+    </div>
+    <table class="spec">
+      <tr><th>삼성 공식 서비스센터</th><td>131,000원 (보증 기간 외) / 무상 (보증 기간 내 85% 미만 시)</td></tr>
+      <tr><th>서드파티 자가 교체</th><td>30,000~40,000원 (11번가, Amazon 기준)</td></tr>
+      <tr><th>서드파티 브랜드</th><td>BOWEIRUI, Kingsener, LBTECH, JIAZIJIA, IZKROR 등</td></tr>
+    </table>
+  </div>
+
+  <!-- 6. 대안 -->
+  <div class="section">
+    <h2><span class="icon">6.</span> 배터리 수명 연장 대안</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+mindmap
+  root((배터리 수명<br/>연장 방안))
+    하드웨어
+      동일 용량 새 배터리 교체
+      USB-C PD 보조배터리 사용
+      USB-C PD 충전기 휴대
+    소프트웨어
+      Samsung Battery Saver 모드
+      Windows 전원 설정 최적화
+      불필요 백그라운드 앱 제거
+    사용 습관
+      80% 이하 충전 유지
+      고온 환경 피하기
+      완전 방전 피하기
+      </pre>
+    </div>
+
+    <div class="alt-box">
+      <h3>권장 조치</h3>
+      <ul>
+        <li><strong>단기:</strong> Samsung Settings에서 배터리 보호 모드(80% 충전 제한) 활성화</li>
+        <li><strong>중기:</strong> 배터리 건강도 80% 이하 도달 시 동일 용량(AA-PBUN3AB) 교체</li>
+        <li><strong>외출 시:</strong> 65W USB-C PD 보조배터리로 보조 충전</li>
+        <li><strong>주의:</strong> 대용량 배터리 교체는 불가하므로 검증되지 않은 개조 시도 금지</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>Samsung Galaxy Book2 NT550XEZ-A58AG 배터리 분석 보고서 | 2026-03-02 생성</p>
+    <p>배터리 데이터 출처: Windows powercfg /batteryreport | 하드웨어 데이터: WMI Query</p>
+  </footer>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    fontFamily: 'Segoe UI, sans-serif',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    pie: { useMaxWidth: true },
+    mindmap: { useMaxWidth: true }
+  });
+</script>
+</body>
+</html>
